@@ -171,7 +171,24 @@ var CheckMilvusStopped = func(ctx context.Context, cli client.Client, mc v1beta1
 		return false, err
 	}
 	if len(podList.Items) > 0 {
+		for _, pod := range podList.Items {
+			if *pod.ObjectMeta.DeletionGracePeriodSeconds <= PodStopGracefulPeriodSeconds {
+				return true, nil
+			}
+			err := UpdatePodGracefulPeriodSeconds(ctx, cli, pod, PodStopGracefulPeriodSeconds)
+			if err != nil {
+				ctrl.LoggerFrom(ctx).Info("stop milvus pod failed", "pod", pod.Name, "err", err.Error())
+			}
+		}
 		return false, nil
 	}
 	return true, nil
+}
+
+const PodStopGracefulPeriodSeconds int64 = 30
+
+func UpdatePodGracefulPeriodSeconds(ctx context.Context, cli client.Client, pod corev1.Pod, sec int64) error {
+	return cli.Delete(ctx, &pod, &client.DeleteOptions{
+		GracePeriodSeconds: &sec,
+	})
 }
