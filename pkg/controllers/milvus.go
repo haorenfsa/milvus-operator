@@ -45,9 +45,9 @@ func (r *MilvusReconciler) ReconcileAll(ctx context.Context, mc v1beta1.Milvus) 
 }
 
 func (r *MilvusReconciler) ReconcileMilvus(ctx context.Context, mc v1beta1.Milvus) error {
-	if !IsDependencyReady(mc.Status.Conditions) {
-		return nil
-	}
+	// if !IsDependencyReady(mc.Status.Conditions) {
+	// 	return nil
+	// }
 
 	if err := r.ReconcileConfigMaps(ctx, mc); err != nil {
 		return fmt.Errorf("configmap: %w", err)
