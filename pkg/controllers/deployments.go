@@ -120,6 +120,7 @@ func (r *MilvusReconciler) ReconcileComponentDeployment(
 	}
 
 	if IsEqual(old, cur) {
+		r.logger.Info("deployment equal", "name", cur.Name, "namespace", cur.Namespace, "component", component)
 		return nil
 	}
 

@@ -55,6 +55,18 @@ type MilvusReconciler struct {
 	qnController   QueryNodeController
 }
 
+func NewMilvusReconcilerForDryRun(cli client.Client, scheme *runtime.Scheme, logger logr.Logger) *MilvusReconciler {
+	return &MilvusReconciler{
+		Client: cli,
+		Scheme: scheme,
+		logger: logger,
+	}
+}
+
+func (r *MilvusReconciler) SetQnController(qnController QueryNodeController) {
+	r.qnController = qnController
+}
+
 //+kubebuilder:rbac:groups=milvus.io,resources=milvuses,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=milvus.io,resources=milvuses/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=milvus.io,resources=milvuses/finalizers,verbs=update

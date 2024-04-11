@@ -245,6 +245,29 @@ func (c *QueryNodeControllerBizImpl) stopDeployIfNot(ctx context.Context, deploy
 	return nil
 }
 
+func (c *QueryNodeControllerBizImpl) HasReplicaChange(ctx context.Context, mc v1beta1.Milvus) error {
+	expectedReplicasPtr := QueryNode.GetReplicas(mc.Spec)
+	expectedReplicas := ReplicasValue(expectedReplicasPtr)
+	currentDeploy, lastDeploy, err := c.util.GetQueryNodeDeploys(ctx, mc)
+	if err != nil {
+		return errors.Wrap(err, "get querynode deploys")
+	}
+	if currentDeploy == nil {
+		return errors.Errorf("querynode deployment not found")
+	}
+	currentDeployReplicas := getDeployReplicas(currentDeploy)
+	lastDeployReplicas := 0
+	if lastDeploy != nil {
+		lastDeployReplicas = getDeployReplicas(lastDeploy)
+	}
+	specReplicas := currentDeployReplicas + lastDeployReplicas
+	if int(expectedReplicas) == specReplicas {
+		return nil
+	}
+	diffReplicas := int(expectedReplicas) - specReplicas
+	return errors.Errorf("replicas changed, diff: %d", diffReplicas)
+}
+
 func (c *QueryNodeControllerBizImpl) HandleScaling(ctx context.Context, mc v1beta1.Milvus) error {
 	expectedReplicasPtr := QueryNode.GetReplicas(mc.Spec)
 	expectedReplicas := ReplicasValue(expectedReplicasPtr)
