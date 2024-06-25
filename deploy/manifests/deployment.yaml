@@ -4848,6 +4848,8 @@ spec:
                           x-kubernetes-int-or-string: true
                         type: object
                     type: object
+                  rollingMode:
+                    type: integer
                   rootCoord:
                     properties:
                       affinity:
@@ -12114,6 +12116,8 @@ spec:
                           x-kubernetes-int-or-string: true
                         type: object
                     type: object
+                  rollingMode:
+                    type: integer
                   rootCoord:
                     properties:
                       affinity:
