@@ -207,7 +207,7 @@ func updateUserDefinedVolumes(template *corev1.PodTemplateSpec, updater deployme
 
 func updateBuiltInVolumes(template *corev1.PodTemplateSpec, updater deploymentUpdater) {
 	builtInVolumes := []corev1.Volume{
-		configVolumeByName(updater.GetIntanceName()),
+		configVolumeByName(updater.GetMilvus().GetActiveConfigMap()),
 		toolVolume,
 	}
 	for _, volume := range builtInVolumes {
