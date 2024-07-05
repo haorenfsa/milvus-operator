@@ -114,6 +114,10 @@ func (r *MilvusReconciler) updateConfigMap(ctx context.Context, mc v1beta1.Milvu
 }
 
 func (r *MilvusReconciler) ReconcileConfigMaps(ctx context.Context, mc v1beta1.Milvus) error {
+	return r.ReconcileConfigMap(ctx, mc, NamespacedName(mc.Namespace, mc.GetActiveConfigMap()))
+}
+
+func (r *MilvusReconciler) ReconcileConfigMap(ctx context.Context, mc v1beta1.Milvus, nn types.NamespacedName) error {
 	namespacedName := NamespacedName(mc.Namespace, mc.Name)
 	old := &corev1.ConfigMap{}
 	err := r.Get(ctx, namespacedName, old)
