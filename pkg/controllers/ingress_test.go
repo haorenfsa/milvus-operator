@@ -7,7 +7,6 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/milvus-io/milvus-operator/apis/milvus.io/v1beta1"
 	"github.com/stretchr/testify/assert"
-	corev1 "k8s.io/api/core/v1"
 	networkingv1 "k8s.io/api/networking/v1"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -77,7 +76,7 @@ func TestMilvusClusterReconciler_ReconcileIngress(t *testing.T) {
 		mockClient.EXPECT().Get(gomock.Any(), gomock.Any(), gomock.Any()).Do(
 			func(any1, any2, input interface{}) {
 				ingress := input.(*networkingv1.Ingress)
-				ingress.Status.LoadBalancer.Ingress = make([]corev1.LoadBalancerIngress, 2)
+				ingress.Status.LoadBalancer.Ingress = make([]networkingv1.IngressLoadBalancerIngress, 2)
 			}).Return(nil)
 		err := r.ReconcileIngress(ctx, mc)
 		assert.NoError(t, err)
@@ -93,7 +92,7 @@ func TestMilvusClusterReconciler_ReconcileIngress(t *testing.T) {
 			func(any1, any2, input interface{}) {
 				ingress := input.(*networkingv1.Ingress)
 				ingress.ObjectMeta.Finalizers = finalizers
-				ingress.Status.LoadBalancer.Ingress = make([]corev1.LoadBalancerIngress, 2)
+				ingress.Status.LoadBalancer.Ingress = make([]networkingv1.IngressLoadBalancerIngress, 2)
 			}).Return(nil)
 		mockClient.EXPECT().Update(gomock.Any(), &rendered).Return(mockErr)
 		err := r.ReconcileIngress(ctx, mc)

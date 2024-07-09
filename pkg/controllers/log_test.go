@@ -30,7 +30,6 @@ func TestPulsarLog(t *testing.T) {
 	logger.EXPECT().WithValues("err", errMock).Return(logger)
 	pl.WithError(errMock)
 
-	logger.EXPECT().V(2).Return(logger)
 	logger.EXPECT().Info("foo,bar")
 	pl.Debugf("foo,%s", "bar")
 	logger.EXPECT().Info("foo,bar")
