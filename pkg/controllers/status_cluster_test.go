@@ -5,6 +5,7 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/go-logr/logr"
 	"github.com/golang/mock/gomock"
 	"github.com/milvus-io/milvus-operator/apis/milvus.io/v1beta1"
 	"github.com/milvus-io/milvus-operator/pkg/util"
@@ -53,7 +54,7 @@ func TestMilvusStatusSyncer_UpdateIngressStatus(t *testing.T) {
 		milvus.Spec.Com.Standalone.Ingress = &v1beta1.MilvusIngress{}
 		mockCli.EXPECT().Get(gomock.Any(), gomock.Any(), gomock.Any()).
 			Do(func(_, _ interface{}, obj *networkv1.Ingress) {
-				obj.Status.LoadBalancer.Ingress = []corev1.LoadBalancerIngress{
+				obj.Status.LoadBalancer.Ingress = []networkv1.IngressLoadBalancerIngress{
 					{
 						Hostname: "host1",
 					},
@@ -433,11 +434,11 @@ func mockConditionGetter() v1beta1.MilvusCondition {
 
 func TestWrapGetter(t *testing.T) {
 	var getter func() v1beta1.MilvusCondition
-	getter = wrapPulsarConditonGetter(nil, nil, v1beta1.MilvusPulsar{})
+	getter = wrapPulsarConditonGetter(nil, logr.Logger{}, v1beta1.MilvusPulsar{})
 	assert.NotNil(t, getter)
 	getter = wrapEtcdConditionGetter(nil, []string{})
 	assert.NotNil(t, getter)
-	getter = wrapMinioConditionGetter(nil, nil, nil, StorageConditionInfo{})
+	getter = wrapMinioConditionGetter(nil, logr.Logger{}, nil, StorageConditionInfo{})
 	assert.NotNil(t, getter)
 }
 
