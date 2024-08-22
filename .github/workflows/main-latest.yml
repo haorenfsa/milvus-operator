@@ -6,6 +6,9 @@ on:
     branches:
       - main
 
+env:
+  REGISTRY_IMAGE: haorenfsa/milvus-operator
+
 jobs:
   build:
     runs-on: ubuntu-latest
