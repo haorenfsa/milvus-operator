@@ -4,7 +4,7 @@ name: Build and Push Latest on Main
 on:
   push:
     branches:
-      - main
+      - dev-*
 
 env:
   REGISTRY_IMAGE: haorenfsa/milvus-operator
@@ -28,7 +28,7 @@ jobs:
       - name: Get version from system time after release step
         id: extracter
         run: |
-          echo "main-latest"
+          echo "::set-output name=git_tag::$(echo "${{ github.ref }}" | awk -F '/' '{print $3}')"
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
