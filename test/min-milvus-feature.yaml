@@ -4,6 +4,14 @@ kind: Namespace
 metadata:
   name: milvus-sit
 ---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: my-release-pulsar-token
+type: Opaque
+stringData:
+  token: my-release-pulsar-token
+---
 apiVersion: milvus.io/v1beta1
 kind: Milvus
 metadata:
@@ -19,6 +27,13 @@ spec:
     standalone:
       ingress:
         hosts: ["mc-sit.milvus.io"]
+    volumes:
+      - name: pulsar-token
+        secret:
+          secretName: my-release-pulsar-token
+    volumeMounts:
+      - name: pulsar-token
+        mountPath: /milvus/pulsar
   dependencies:
     etcd:
       inCluster:
@@ -44,6 +59,9 @@ spec:
         deletionPolicy: Delete
         pvcDeletion: true
         values:
+          auth:
+            authentication:
+              enabled: true
           persistence: false
           volumes:
             persistence: false
@@ -98,6 +116,9 @@ spec:
               managedLedgerDefaultEnsembleSize: "1"
               managedLedgerDefaultWriteQuorum: "1"
               managedLedgerDefaultAckQuorum: "1"
+              authenticationProviders: "org.apache.pulsar.broker.authentication.AuthenticationProviderToken"
+              brokerClientAuthenticationParameters: "file:///pulsar/tokens/proxy/token"
+              brokerClientAuthenticationPlugin: "org.apache.pulsar.client.impl.auth.AuthenticationToken"
           proxy:
             replicaCount: 1
             autoscaling:
@@ -113,6 +134,9 @@ spec:
             configData:
               PULSAR_MEM: >
                 -Xms64m -Xmx512m -XX:MaxDirectMemorySize=2048m
+              authenticationProviders: "org.apache.pulsar.broker.authentication.AuthenticationProviderToken"
+              brokerClientAuthenticationParameters: "file:///pulsar/tokens/proxy/token"
+              brokerClientAuthenticationPlugin: "org.apache.pulsar.client.impl.auth.AuthenticationToken"
         # end pulsar values
   config:
     rootCoord:
@@ -129,3 +153,6 @@ spec:
     component:
       proxy:
         timeTickInterval: 150
+    pulsar:
+      authPlugin: token
+      authParams: file:/milvus/pulsar/token

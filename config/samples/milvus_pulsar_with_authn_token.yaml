@@ -1,0 +1,55 @@
+# This is an example of Milvus deployment with Pulsar with token authentication.
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: my-release-pulsar-token
+type: Opaque
+stringData:
+  token: put-your-token-here # The token for Pulsar authentication
+---
+apiVersion: milvus.io/v1beta1
+kind: Milvus
+metadata:
+  name: my-release
+  labels:
+    app: milvus
+spec:
+  config:
+    pulsar:
+      authPlugin: token
+      authParams: file:/milvus/pulsar/token
+  component:
+    volumes:
+      - name: pulsar-token
+        secret:
+          secretName: my-release-pulsar-token
+    volumeMounts:
+      - name: pulsar-token
+        mountPath: /milvus/pulsar
+  dependencies:
+    msgStreamType: pulsar
+    pulsar:
+      inCluster:
+        values:
+          pulsar:
+            auth:
+              authentication:
+                enabled: true
+            broker:
+              configData:
+                authenticationProviders: "org.apache.pulsar.broker.authentication.AuthenticationProviderToken"
+                brokerClientAuthenticationParameters: "file:///pulsar/tokens/broker/token"
+                brokerClientAuthenticationPlugin: "org.apache.pulsar.client.impl.auth.AuthenticationToken"
+              extraVolumes:
+                - name: pulsar-token
+                  secret:
+                    secretName: my-release-pulsar-token
+              extraVolumeMounts:
+                - name: pulsar-token
+                  mountPath: /pulsar/tokens/broker
+            proxy:
+              configData:
+                authenticationProviders: "org.apache.pulsar.broker.authentication.AuthenticationProviderToken"
+                brokerClientAuthenticationParameters: "file:///pulsar/tokens/proxy/token"
+                brokerClientAuthenticationPlugin: "org.apache.pulsar.client.impl.auth.AuthenticationToken"

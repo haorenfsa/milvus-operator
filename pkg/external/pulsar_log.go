@@ -1,4 +1,4 @@
-package controllers
+package external
 
 import (
 	"fmt"
@@ -6,6 +6,20 @@ import (
 	pulsarlog "github.com/apache/pulsar-client-go/pulsar/log"
 	"github.com/go-logr/logr"
 )
+
+// Logger for mock
+type Logger interface {
+	Enabled() bool
+	Error(err error, msg string, keysAndValues ...interface{})
+	GetSink() logr.LogSink
+	Info(msg string, keysAndValues ...interface{})
+	V(level int) logr.Logger
+	WithCallDepth(depth int) logr.Logger
+	WithCallStackHelper() (func(), logr.Logger)
+	WithName(name string) logr.Logger
+	WithSink(sink logr.LogSink) logr.Logger
+	WithValues(keysAndValues ...interface{}) logr.Logger
+}
 
 type pulsarLog struct {
 	logger logr.Logger
