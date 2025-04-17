@@ -20,7 +20,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/coreos/go-semver/semver"
+	"github.com/blang/semver/v4"
 	"github.com/pkg/errors"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -120,7 +120,8 @@ func (ms MilvusSpec) GetMilvusVersionByImage() (*semver.Version, error) {
 	if len(splited) != 2 {
 		return nil, errors.Errorf("unknown version of image[%s]", splited[0])
 	}
-	return util.GetSemanticVersion(splited[1])
+	v, err := semver.ParseTolerant(splited[1])
+	return &v, err
 }
 
 func (ms *MilvusSpec) GetPersistenceConfig() *Persistence {
